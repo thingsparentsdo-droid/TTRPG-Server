@@ -44,6 +44,7 @@ def PlayerDataModel(player):
         Model["Items"].append(["Bow",15])
     else:
         return "Invalid Class"
+    players.append(Model)
     return Model
 
 
