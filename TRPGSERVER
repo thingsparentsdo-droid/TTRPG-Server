@@ -19,7 +19,7 @@ def PlayerDataModel(player):
         Model["Stats"]["Strength"] += 5
         Model["HP"] += 20
         Model["Actions"].append(["Power Strike","Sword",30])
-        Model["Actions"].append(["Shield Block","Shield",20])
+        Model["Actions"].append(["Shield","Shield",20])
         Model["Items"].append(["Sword",10])
         Model["Items"].append(["Shield",10])
     elif player.class_ == "Mage":
@@ -44,8 +44,38 @@ def PlayerDataModel(player):
         Model["Items"].append(["Bow",15])
     else:
         return "Invalid Class"
+    Model["HP"] = random.randint(Model["HP"]/2,Model["HP"]) + Model["Stats"]["Constitution"]
     players.append(Model)
     return Model
+
+class Fight(BaseModel):
+    actions : list
+    name : str
+    player : dict
+
+@GameServer.post("/Fight")
+def Fight(Fight):
+    for a in Fight.actions:
+        for c in Fight.player["Actions"]:
+            for i in Fight.player["Items"]:
+                if a == c[0] and c[1] == i[0]:
+                    if i[0] == "Shield":
+                        if i[1] > 0:
+                            damage = damage - c[2]
+                            i[1] -= 1
+                    else:
+                        if i[1] > 0:
+                            if a == "Steal" or a == "Stab" or a == "Bow":
+                                attack += c[2] + Fight.player["Stats"]["Dexterity"]
+                            elif a == "Power Strike":
+                                attack += c[2] + Fight.player["Stats"]["Strength"]
+                            elif a == "Fireball":
+                                attack += c[2] + Fight.player["Stats"]["Intelligence"]
+                            elif a == "Charm":
+                                attack += c[2] + Fight.player["Stats"]["Charisma"]
+                            i[1] -= 1
+        
+    
 
 
 
