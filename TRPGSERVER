@@ -1,0 +1,50 @@
+from fastapi import FastAPI
+from pydantic import BaseModel
+import requests
+import random
+import json
+GameServer = FastAPI()
+players =[]
+class Player(BaseModel):
+    name: str
+    class_: str
+@GameServer.get("/PlayerDataModel")
+def PlayerDataModel(player):
+    with open("PlayerModel") as f:
+        data = json.load(f)
+        Model = data["Model"]
+    Model["name"] = player.name
+    Model["class"] = player.class_
+    if player.class_ == "Warrior":
+        Model["Stats"]["Strength"] += 5
+        Model["HP"] += 20
+        Model["Actions"].append(["Power Strike","Sword",30])
+        Model["Actions"].append(["Shield Block","Shield",20])
+        Model["Items"].append(["Sword",10])
+        Model["Items"].append(["Shield",10])
+    elif player.class_ == "Mage":
+        Model["Stats"]["Intelligence"] += 5
+        Model["HP"] += 10
+        Model["Actions"].append(["Fireball","Spell",50])
+        Model["Actions"].append(["Shield","Spell",30])
+        Model["Items"].append(["Spellbook",15])
+    elif player.class_ == "Thieve":
+        Model["Stats"]["Dexterity"] += 5
+        Model["HP"] += 15
+        Model["Actions"].append(["Stab","Dagger",17])
+        Model["Actions"].append(["Steal","Hand",30])
+        Model["Items"].append(["Dagger",15])
+    elif player.class_ == "Bard":
+        Model["Stats"]["Charisma"] += 5
+        Model["MP"] += 5
+        Model["HP"] += 10
+        Model["Actions"].append(["Bow","Bow",20])
+        Model["Actions"].append(["Charm","Instrument",30])
+        Model["Items"].append(["Instrument",20])
+        Model["Items"].append(["Bow",15])
+    else:
+        return "Invalid Class"
+    return Model
+
+
+
